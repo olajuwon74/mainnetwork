@@ -1,33 +1,64 @@
 /* eslint-disable prettier/prettier */
-import { Signer } from "ethers";
+import { BigNumber, BigNumberish, Bytes, BytesLike } from 'ethers'
 import { ethers } from "hardhat";
 const hre = require('hardhat');
 
 async function getBalanceOf() {
-  const address = "0x205ab90806513017463f3d3869efdc29cb78a6b7";
-//   const randAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
+  const address = "0x75cc431c0b332f6a94a4ae170b2a8399c2871798";
+  // const randAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
   const RBN = await ethers.getContractAt(
     "IERC20",
     "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
   );
-//   const bal = await (await RBN).balanceOf(address);
-//   console.log(bal);
-// }
 
 // @ts-ignore
     await hre.network.provider.request({
         method: "hardhat_impersonateAccount",
         params: [address],
       });
+      
+  const together: BytesLike = new ethers.utils.AbiCoder().encode(
+    ['address', 'uint256'],
+    [address, 0],
+  )
+  const position: BytesLike = ethers.utils.solidityKeccak256(
+    ['bytes'],
+    [together],
+  )
 
-      const signer: Signer = await ethers.getSigner(address);
-     await RBN.connect(signer).transfer(address, 2000000);
+  const dec: BigNumberish = BigNumber.from(position)
+  // console.log(dec)
+  const balance = await ethers.provider.getStorageAt(RBN.address, dec)
+  console.log(balance);
+  console.log(await RBN.balanceOf(address))
+
+  await ethers.provider.send('hardhat_setStorageAt', [
+    RBN.address,
+    position,
+    '0x00000000000000000000000000000000000000000000000000000000000186A0',
+  ])
+  console.log(balance);
+  console.log(await RBN.balanceOf(address))
+
+    
+
+    //  const signer: Signer = await ethers.getSigner(address);
+    //  await RBN.connect(signer).transfer(randAddress, 2000000);
+    //  const bal = await RBN.balanceOf(address);
+    //  const balran = await RBN.balanceOf(randAddress);
+    //  console.log(balran);
+    //  console.log(bal);
     }
 
 getBalanceOf().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+//   const bal = await (await RBN).balanceOf(address);
+//   console.log(bal);
+// }
+
 
 
 // import { BigNumber, BigNumberish, Bytes, BytesLike, Signer } from 'ethers'
