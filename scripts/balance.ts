@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { BigNumber, BigNumberish, Bytes, BytesLike } from 'ethers'
+import { BigNumber, BigNumberish, BytesLike } from 'ethers'
 import { ethers } from "hardhat";
 const hre = require('hardhat');
 
